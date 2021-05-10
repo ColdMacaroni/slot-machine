@@ -4,7 +4,7 @@
 
 import pygame
 from os import listdir
-from random import randint
+from random import randint, choice
 
 
 class Color:
@@ -50,6 +50,10 @@ def load_images(directory):
     # Placeholder
     img_files = listdir(directory)
 
+    # TODO: Consider if making imgs a dict is worth it
+    # The key would be the filename. This could make debugging and such easier
+    # but i dont know if itd have any use in the code
+
     imgs = []
     for img in img_files:
         # Convert transfors the image into a faster-to-draw format
@@ -76,6 +80,27 @@ def load_images(directory):
     return imgs
 
 
+def generate_roll(ls, columns, rolls):
+    """
+    Generate a list for each column consisting of a rolls amount of
+    random items picked of syms
+    :param ls: a list, any list
+    :param columns: the amount of columns to be generated
+    :param rolls: the amount of rolls per columns, useful for making
+    the roll animation.
+    :return: 2D list
+    """
+    generated = []
+
+    # For each column
+    for i in range(columns):
+        # Generate a list with rolls amount of random items from ls
+        # Then add it to the list of stuff that has been generated
+        generated.append([choice(ls) for _ in range(rolls)])
+
+    return generated
+
+
 def main():
     # Pygame set up
     pygame.init()
@@ -93,12 +118,22 @@ def main():
             if event.type == pygame.QUIT:
                 exit()
 
+            # TODO: Maybe key event stuff inside a func? Consider.
+            # Simply call it with the event
+            #
             # Only check for keys when a key has been pressed down
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     print("SCATTER!")
                     for i in range(len(symbols)):
                         symbols[i][1].update((randint(0, width), randint(0, height)), symbols[i][1].size)
+
+            # Check for mouse button
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # If ANY mouse button has been pressed, print if the
+                # cursor was inside the image
+                for i in range(len(symbols)):
+                    print(pos_inside_rect(symbols[i][1], pygame.mouse.get_pos()))
 
         screen.fill(Color.white)
 
