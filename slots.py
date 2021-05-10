@@ -6,6 +6,7 @@ import pygame
 from os import listdir
 from random import randint
 
+
 class Color:
     # This class is for quickly accessing different colors
     white = (255, 255, 255)
@@ -15,11 +16,30 @@ class Color:
     green = (0, 255, 0)
     blue = (0, 0, 255)
 
+
 def screen_size():
     """
     Set screen size
     """
     return 600, 600
+
+
+# Not sure if pygame has a builtin so im creating this
+def pos_inside_rect(rect, pos):
+    """
+    Returns whether or not a position is inside a rect
+    :param rect: pygame Rect object
+    :param pos: (x, y) coordinate
+    :return: bool
+    """
+    # Get coordinates
+    # In a pygame coord system:
+    # x, y = top left
+    # x1, y2 = top right
+    rect_x, rect_y = rect.x, rect.y
+    rect_x1, rect_y1 = rect_x + rect.width, rect_y + rect.height
+
+    return (rect_x <= pos[0] <= rect_x1) and (rect_y <= pos[1] <= rect_y1)
 
 
 def load_images(directory):
