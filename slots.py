@@ -4,6 +4,7 @@
 
 import pygame
 from os import listdir
+from random import randint
 
 class Color:
     # This class is for quickly accessing different colors
@@ -47,9 +48,7 @@ def load_images(directory):
         #
         # if obj is Rect:
         # obj.update((new_x, new_y), (obj.width), (obj.height))
-        # By default created at 0, 0
-        # Create with centre at (0, 0) instead of top-left
-        image_rect = image.get_rect()
+        # By default created with top-left at 0, 0
         image_rect = image.get_rect()
 
         imgs.append([image, image_rect])
@@ -74,12 +73,19 @@ def main():
             if event.type == pygame.QUIT:
                 exit()
 
+            # Only check for keys when a key has been pressed down
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    print("SCATTER!")
+                    for i in range(len(symbols)):
+                        symbols[i][1].update((randint(0, width), randint(0, height)), symbols[i][1].size)
+
         screen.fill(Color.white)
 
         # Use blit to draw images
         # screen.blit(img, rect)
-        for symbol in symbols:
-            screen.blit(symbol[0], symbol[1])
+        for i in range(len(symbols)):
+            screen.blit(symbols[i][0], symbols[i][1])
 
         pygame.display.flip()
         clock.tick(60)
