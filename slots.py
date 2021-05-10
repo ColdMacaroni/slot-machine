@@ -27,10 +27,10 @@ def load_images(directory):
     then drawn by pygame
     """
     # Placeholder
-    dir_imgs = []
+    img_files = listdir(directory)
 
     imgs = []
-    for img in dir_imgs:
+    for img in img_files:
         # Convert transfors the image into a faster-to-draw format
         image = pygame.image.load(f'{directory}/{img}').convert()
 
@@ -47,7 +47,9 @@ def load_images(directory):
         #
         # if obj is Rect:
         # obj.update((new_x, new_y), (obj.width), (obj.height))
-
+        # By default created at 0, 0
+        # Create with centre at (0, 0) instead of top-left
+        image_rect = image.get_rect()
         image_rect = image.get_rect()
 
         imgs.append([image, image_rect])
@@ -76,8 +78,8 @@ def main():
 
         # Use blit to draw images
         # screen.blit(img, rect)
-
-        # for image in imgaes, etc
+        for symbol in symbols:
+            screen.blit(symbol[0], symbol[1])
 
         pygame.display.flip()
         clock.tick(60)
