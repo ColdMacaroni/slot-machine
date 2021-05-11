@@ -281,7 +281,6 @@ def create_values(amount,
     return wild_val, values
 
 
-# NOTE: This will be removed after class is done
 def load_images(screen, directory):
     """
     Load all images from a directory into a list so that they can be
@@ -294,6 +293,7 @@ def load_images(screen, directory):
     wild = None
     # Create symbol objects
     for img in range(len(img_files)):
+        # I dont know why pycharm expects an int
         if "wild" in img_files[img]:
             # The wild symbol will be done after
             wild = img_files[img]
@@ -342,7 +342,16 @@ def generate_roll(ls, columns, rolls):
     for i in range(columns):
         # Generate a list with rolls amount of random items from ls
         # Then add it to the list of stuff that has been generated
-        generated.append([choice(ls) for _ in range(rolls)])
+        column_rolls = []
+        for j in range(rolls):
+            # Create a copy of a random item from the list
+            item = deepcopy(ls[randint(0, len(ls) - 1)])
+
+            # Add to the rolls
+            column_rolls.append(item)
+
+        # Add to the columns
+        generated.append(column_rolls)
 
     return generated
 
