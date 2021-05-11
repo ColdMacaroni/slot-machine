@@ -252,43 +252,74 @@ def pos_inside_rect(rect, pos):
     return (rect_x <= pos[0] <= rect_x1) and (rect_y <= pos[1] <= rect_y1)
 
 
+def create_values(amount,
+                  wild_val=5, default_val=10,
+                  max_val=60, big_vals=3):
+    """
+    Create a list of values according to the amount given and
+    parameters
+    :return:
+    """
+    values = []
+
+    # Reduce the amount
+    if big_vals > amount:
+        big_vals = amount
+
+    # Generate big values
+    for i in range(big_vals):
+        values.append(max_val - wild_val * i)
+
+    # Generate default values
+    for _ in range(amount - len(values)):
+        values.append(default_val)
+
+    if len(values) != amount:
+        raise ValueError("Amount and values arent the same.\n"
+                         "Amount: {}, Values: {}. {}".format(amount, len(values), values))
+
+    return wild_val, values
+
+
 # NOTE: This will be removed after class is done
 def load_images(screen, directory):
     """
     Load all images from a directory into a list so that they can be
     then drawn by pygame
     """
+
     # Placeholder
     img_files = listdir(directory)
 
     # TODO: Pass img_files through isfile()
 
     imgs = []
-
+    wild = None
     # Create symbol objects
     for img in range(len(img_files)):
         if "wild" in img_files[img]:
             # The wild symbol will be done after
+            wild = img_files[img]
             continue
+
         imgs.append(SlotSymbol(screen, img, img_files[img], value=None))
 
-    # Load values
-    # Idk about actual values
-    values = [50, 40, 30]
-
-    # Add a basic value for the resulting ones
-    for _ in range(len(values)):
-        values.append(10)
-
-    if len(values) != len(img_files):
-        raise IndexError('Values and img_files arent the same!')
+    # -- Load values
+    # Create values
+    # Idk about actual values so uh yeah
+    wild_val, values = create_values(len(imgs))
 
     # Assign the values
     for i in range(len(imgs)):
-
         imgs[i].value = values[i]
-    # Add the wild symbol with a special id
 
+    # Add the wild symbol with a special id
+    if wild is not None:
+        imgs.append(WildSymbol(screen, -1, wild, wild_val))
+
+    # Load all images
+    for img in imgs:
+        img.load_image()
 
     return imgs
 
@@ -340,23 +371,25 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     print("SCATTER!")
-                    for i in range(len(symbols)):
-                        symbols[i][1].update((randint(0, width), randint(0, height)), symbols[i][1].size)
+                    #for i in range(len(symbols)):
+                        #symbols[i][1].update((randint(0, width), randint(0, height)), symbols[i][1].size)
 
             # Check for mouse button
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                pass
                 # If ANY mouse button has been pressed, print if the
                 # cursor was inside the image
-                for i in range(len(symbols)):
-                    print(pos_inside_rect(symbols[i][1], pygame.mouse.get_pos()))
+                #for i in range(len(symbols)):
+                #    print(pos_inside_rect(symbols[i][1], pygame.mouse.get_pos()))
 
         screen.fill(Color.white)
-
+        for sym in symbols:
+            sym.draw()
         # TODO: Update to work with the class
         # Use blit to draw images
         # screen.blit(img, rect)
-        for i in range(len(symbols)):
-            screen.blit(symbols[i][0], symbols[i][1])
+        #for i in range(len(symbols)):
+        #    screen.blit(symbols[i][0], symbols[i][1])
 
         pygame.display.flip()
         clock.tick(60)
