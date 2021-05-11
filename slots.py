@@ -7,6 +7,120 @@ from os import listdir
 from random import randint, choice
 
 
+class SlotSymbol:
+    def __init__(self, sym_id, filename, value,
+                 size=(75, 75), pos=(0, 0), color_key=(0, 0, 0)):
+        """
+        Generate an image to be used in the slot machine
+        :param sym_id: An integer that is used for comparison
+        :param filename: The file name for the image to be loaded
+        :param value: The value to be used in calculating scores
+
+        :keyword size: Tuple with size of image in px
+        :keyword pos: X,Y position the image will be drawn at
+        :keyword color_key: The rgb color to be used as transparency
+        """
+        # Params
+        self.sym_id = sym_id
+        self.filename = filename
+        self.value = value
+
+        # Key words
+        self.size = self.width, self.height = size
+        self.pos = self.x, self.y = pos
+        self.color_key = color_key
+
+        # To be changed by self.load_images()
+        self.image = None
+        self.rect = None
+
+    def __eq__(self, other):
+        # Comparison to be done by IDs instead of objects themselves
+        if isinstance(other, SlotSymbol):
+            return self.sym_id == other.sym_id
+
+        else:
+            return False
+
+    # -- Set Methods
+    # X
+    def set_x(self, x):
+        """
+        Updates the object's x coordinate
+        :param x: A number, any number
+        """
+        self.x = x
+
+        # Also update rect if defined
+        if self.rect is not None:
+            self.rect.x = self.x
+
+    # Y
+    def set_y(self, y):
+        """
+        Updates the object's y coordinate
+        :param y: A number, any number
+        """
+        self.y = y
+
+        # Also update rect if defined
+        if self.rect is not None:
+            self.rect.y = self.y
+
+    # X, Y
+    def set_pos(self, pos):
+        """
+        A shortcut to set_x and set_y
+        :param pos: Tuple
+        """
+        if type(pos) == tuple and len(pos) == 2:
+            self.set_x(pos[0])
+            self.set_y(pos[1])
+
+        else:
+            raise ValueError('Position should be a tuple consisting '
+                             'of x and y coordinates')
+
+    # -- Get methods
+    def get_x(self):
+        """
+        Returns the object's x value
+        :return: Number
+        """
+        return self.x
+
+    def get_y(self):
+        """
+        Returns the object's y value
+        :return: Number
+        """
+        return self.y
+
+    def get_pos(self):
+        """
+        Shortcut to get_x and get_y
+        :return: Tuple
+        """
+        return self.get_x(), self.get_y()
+    # --
+
+    def load_image(self):
+        """
+        Loads this objects pygame image into its variables
+        """
+        # Convert transforms the image into a faster-to-draw format
+        self.image = pygame.image.load(self.filename).convert()
+
+        # Scales the image to the specified size
+        self.image = pygame.transform.scale(self.image, self.size)
+
+        # Treat the given color key as transparent
+        self.image.set_colorkey(self.color_key)
+
+        # Get rect object
+        self.rect = self.image.get_rect()
+
+
 class Color:
     # This class is for quickly accessing different colors
     white = (255, 255, 255)
