@@ -390,8 +390,8 @@ def main():
                     for column in range(len(rolls)):
                         for symbol in range(len(rolls[column])):
                             # Offset each column
-                            x = column * 80
-                            y = symbol * 80
+                            x = column * 120
+                            y = symbol * 120
 
                             rolls[column][symbol].set_pos((x, y))
 
