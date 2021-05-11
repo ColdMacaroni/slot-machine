@@ -287,10 +287,7 @@ def load_images(screen, directory):
     Load all images from a directory into a list so that they can be
     then drawn by pygame
     """
-
-    # Placeholder
     img_files = listdir(path.join(*directory))
-
     # TODO: Pass img_files through isfile()
 
     imgs = []
@@ -320,8 +317,9 @@ def load_images(screen, directory):
         imgs.append(WildSymbol(screen, -1, wild, wild_val))
 
     # Load all images
+    # This is done so that they dont have to be loaded
+    # for every copy
     for img in imgs:
-        print(img.filename)
         img.load_image()
 
     return imgs
