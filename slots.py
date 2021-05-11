@@ -124,6 +124,13 @@ class SlotSymbol:
             raise ValueError('Size should be a tuple consisting '
                              'of width and height values in px')
 
+    # Value
+    def set_value(self, value):
+       """
+       Setting the value!
+       """
+       self.value = value
+
     # -- Get methods
     # X
     def get_x(self):
@@ -150,8 +157,10 @@ class SlotSymbol:
         return self.get_x(), self.get_y()
 
     # Width
+    
     # Height
     # Width, Height
+    # Value
     # --
 
     def load_image(self):
@@ -193,6 +202,17 @@ class SlotSymbol:
         self.surface.blit(self.image, self.rect)
 
 
+# Subclass
+class WildSymbol(SlotSymbol):
+    def __eq__(self, other):
+        if isinstance(other, SlotSymbol):
+            # A Wild card will always match with others
+            return True
+
+        else:
+            return False
+
+
 class Color:
     # This class is for quickly accessing different colors
     white = (255, 255, 255)
@@ -229,7 +249,7 @@ def pos_inside_rect(rect, pos):
 
 
 # NOTE: This will be removed after class is done
-def load_images(directory):
+def load_images(screen, directory):
     """
     Load all images from a directory into a list so that they can be
     then drawn by pygame
@@ -237,32 +257,34 @@ def load_images(directory):
     # Placeholder
     img_files = listdir(directory)
 
-    # TODO: Consider if making imgs a dict is worth it
-    # The key would be the filename. This could make debugging and such easier
-    # but i don't know if itd have any use in the code
+    # TODO: Pass img_files through isfile()
 
     imgs = []
-    for img in img_files:
-        # Convert transforms the image into a faster-to-draw format
-        image = pygame.image.load(f'{directory}/{img}').convert()
 
-        # Resize
-        image = pygame.transform.scale(image, (75, 75))
+    # Create symbol objects
+    for img in range(len(img_files)):
+        if "wild" in img_files[img]:
+            # The wild symbol will be done after
+            continue
+        imgs.append(SlotSymbol(screen, img, img_files[img], value=None))
 
-        # This will treat pure black as transparent
-        image.set_colorkey(Color.black)
+    # Load values
+    # Idk about actual values
+    values = [50, 40, 30]
 
-        # This generates a rectangle object in which the
-        # image will be drawn
-        # The rectangle can be updated with Rect.update((x, y), (width, height))
-        # (x,y) = top left
-        #
-        # if obj is Rect:
-        # obj.update((new_x, new_y), (obj.width), (obj.height))
-        # By default created with top-left at 0, 0
-        image_rect = image.get_rect()
+    # Add a basic value for the resulting ones
+    for _ in range(len(values)):
+        values.append(10)
 
-        imgs.append([image, image_rect])
+    if len(values) != len(img_files):
+        raise IndexError('Values and img_files arent the same!')
+
+    # Assign the values
+    for i in range(len(imgs)):
+
+        imgs[i].value = values[i]
+    # Add the wild symbol with a special id
+
 
     return imgs
 
@@ -299,7 +321,7 @@ def main():
     clock = pygame.time.Clock()
 
     # Load symbols
-    symbols = load_images("images/symbols")
+    symbols = load_images(screen, "images/symbols")
 
     running = True
     while running:
