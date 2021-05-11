@@ -8,7 +8,7 @@ from random import randint, choice
 
 # Use deepcopy when selecting from the list, this way the x, y and
 # other attributes can be changed independently
-from copy import deepcopy
+from copy import copy
 
 
 class SlotSymbol:
@@ -126,10 +126,10 @@ class SlotSymbol:
 
     # Value
     def set_value(self, value):
-       """
-       Setting the value!
-       """
-       self.value = value
+        """
+        Setting the value!
+        """
+        self.value = value
 
     # -- Get methods
     # X
@@ -301,7 +301,7 @@ def load_images(screen, directory):
 
         imgs.append(SlotSymbol(screen, img,
                                path.join(*directory, img_files[img]),
-                               value=None))
+                               value=None, size=(100, 100)))
 
     # -- Load values
     # Create values
@@ -345,7 +345,7 @@ def generate_roll(ls, columns, rolls):
         column_rolls = []
         for j in range(rolls):
             # Create a copy of a random item from the list
-            item = deepcopy(ls[randint(0, len(ls) - 1)])
+            item = copy(ls[randint(0, len(ls) - 1)])
 
             # Add to the rolls
             column_rolls.append(item)
@@ -354,6 +354,9 @@ def generate_roll(ls, columns, rolls):
         generated.append(column_rolls)
 
     return generated
+
+
+# TODO: Evenly space columns
 
 
 def main():
@@ -369,6 +372,8 @@ def main():
     # Path is a list to be used with path.join()
     symbols = load_images(screen, ["images", "symbols"])
 
+    rolls = generate_roll(symbols, 3, 10)
+
     running = True
     while running:
         for event in pygame.event.get():
@@ -382,8 +387,13 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     print("SCATTER!")
-                    #for i in range(len(symbols)):
-                        #symbols[i][1].update((randint(0, width), randint(0, height)), symbols[i][1].size)
+                    for column in range(len(rolls)):
+                        for symbol in range(len(rolls[column])):
+                            # Offset each column
+                            x = column * 80
+                            y = symbol * 80
+
+                            rolls[column][symbol].set_pos((x, y))
 
             # Check for mouse button
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -394,8 +404,10 @@ def main():
                 #    print(pos_inside_rect(symbols[i][1], pygame.mouse.get_pos()))
 
         screen.fill(Color.white)
-        for sym in symbols:
-            sym.draw()
+
+        for column in rolls:
+            for symbol in column:
+                symbol.draw()
         # TODO: Update to work with the class
         # Use blit to draw images
         # screen.blit(img, rect)
