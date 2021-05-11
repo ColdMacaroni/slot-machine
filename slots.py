@@ -6,12 +6,17 @@ import pygame
 from os import listdir
 from random import randint, choice
 
+# Use deepcopy when selecting from the list, this way the x, y and
+# other attributes can be changed independently
+from copy import deepcopy
+
 
 class SlotSymbol:
-    def __init__(self, sym_id, filename, value,
+    def __init__(self, surface, sym_id, filename, value,
                  size=(75, 75), pos=(0, 0), color_key=(0, 0, 0)):
         """
         Generate an image to be used in the slot machine
+        :param surface: Pygame surface
         :param sym_id: An integer that is used for comparison
         :param filename: The file name for the image to be loaded
         :param value: The value to be used in calculating scores
@@ -21,13 +26,14 @@ class SlotSymbol:
         :keyword color_key: The rgb color to be used as transparency
         """
         # Params
+        self.surface = surface
         self.sym_id = sym_id
         self.filename = filename
         self.value = value
 
         # Key words
-        self.size = self.width, self.height = size
-        self.pos = self.x, self.y = pos
+        self.width, self.height = size
+        self.x, self.y = pos
         self.color_key = color_key
 
         # To be changed by self.load_images()
@@ -81,7 +87,45 @@ class SlotSymbol:
             raise ValueError('Position should be a tuple consisting '
                              'of x and y coordinates')
 
+    # These are pretty much the same as the x, y ones
+    # Width
+    def set_width(self, width):
+        """
+        Updates the object's width
+        :param width: Width in px
+        """
+        self.width = width
+
+        if self.rect is not None:
+            self.rect.width = self.width
+
+    # Height
+    def set_height(self, height):
+        """
+        Updates the object's height
+        :param height: height in px
+        """
+        self.height = height
+
+        if self.rect is not None:
+            self.rect.height = self.height
+
+    # Width, Height
+    def set_size(self, size):
+        """
+        A shortcut to set_width and set_height
+        :param size: Tuple
+        """
+        if type(size) == tuple and len(size) == 2:
+            self.set_height(size[0])
+            self.set_width(size[1])
+
+        else:
+            raise ValueError('Size should be a tuple consisting '
+                             'of width and height values in px')
+
     # -- Get methods
+    # X
     def get_x(self):
         """
         Returns the object's x value
@@ -89,6 +133,7 @@ class SlotSymbol:
         """
         return self.x
 
+    # Y
     def get_y(self):
         """
         Returns the object's y value
@@ -96,12 +141,17 @@ class SlotSymbol:
         """
         return self.y
 
+    # X, Y
     def get_pos(self):
         """
         Shortcut to get_x and get_y
         :return: Tuple
         """
         return self.get_x(), self.get_y()
+
+    # Width
+    # Height
+    # Width, Height
     # --
 
     def load_image(self):
@@ -112,13 +162,35 @@ class SlotSymbol:
         self.image = pygame.image.load(self.filename).convert()
 
         # Scales the image to the specified size
-        self.image = pygame.transform.scale(self.image, self.size)
+        self.image = pygame.transform.scale(self.image,
+                                            (self.width, self.height))
 
         # Treat the given color key as transparent
         self.image.set_colorkey(self.color_key)
 
         # Get rect object
         self.rect = self.image.get_rect()
+
+        # Update rect obj
+        self.rect.update((self.x, self.y), (self.width, self.height))
+
+    def draw(self):
+        """
+        Blits the image into the surface
+        """
+        # These updates are handled by the set methods but i am
+        # Also including them here in case they are set directly
+        # (Which you shouldn't do!)
+
+        # Update rect obj
+        self.rect.update((self.x, self.y), (self.width, self.height))
+
+        # Resize img
+        self.image = pygame.transform.scale(self.image,
+                                            (self.width, self.height))
+
+        # Draw image
+        self.surface.blit(self.image, self.rect)
 
 
 class Color:
@@ -156,6 +228,7 @@ def pos_inside_rect(rect, pos):
     return (rect_x <= pos[0] <= rect_x1) and (rect_y <= pos[1] <= rect_y1)
 
 
+# NOTE: This will be removed after class is done
 def load_images(directory):
     """
     Load all images from a directory into a list so that they can be
@@ -166,11 +239,11 @@ def load_images(directory):
 
     # TODO: Consider if making imgs a dict is worth it
     # The key would be the filename. This could make debugging and such easier
-    # but i dont know if itd have any use in the code
+    # but i don't know if itd have any use in the code
 
     imgs = []
     for img in img_files:
-        # Convert transfors the image into a faster-to-draw format
+        # Convert transforms the image into a faster-to-draw format
         image = pygame.image.load(f'{directory}/{img}').convert()
 
         # Resize
@@ -194,6 +267,7 @@ def load_images(directory):
     return imgs
 
 
+# TODO: Change this to support the class
 def generate_roll(ls, columns, rolls):
     """
     Generate a list for each column consisting of a rolls amount of
@@ -252,6 +326,7 @@ def main():
 
         screen.fill(Color.white)
 
+        # TODO: Update to work with the class
         # Use blit to draw images
         # screen.blit(img, rect)
         for i in range(len(symbols)):
