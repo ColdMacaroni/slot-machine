@@ -3,7 +3,7 @@
 # A slot machine!
 
 import pygame
-from os import listdir
+from os import listdir, path
 from random import randint, choice
 
 # Use deepcopy when selecting from the list, this way the x, y and
@@ -289,7 +289,7 @@ def load_images(screen, directory):
     """
 
     # Placeholder
-    img_files = listdir(directory)
+    img_files = listdir(path.join(*directory))
 
     # TODO: Pass img_files through isfile()
 
@@ -302,7 +302,9 @@ def load_images(screen, directory):
             wild = img_files[img]
             continue
 
-        imgs.append(SlotSymbol(screen, img, img_files[img], value=None))
+        imgs.append(SlotSymbol(screen, img,
+                               path.join(*directory, img_files[img]),
+                               value=None))
 
     # -- Load values
     # Create values
@@ -319,6 +321,7 @@ def load_images(screen, directory):
 
     # Load all images
     for img in imgs:
+        print(img.filename)
         img.load_image()
 
     return imgs
@@ -356,7 +359,8 @@ def main():
     clock = pygame.time.Clock()
 
     # Load symbols
-    symbols = load_images(screen, "images/symbols")
+    # Path is a list to be used with path.join()
+    symbols = load_images(screen, ["images", "symbols"])
 
     running = True
     while running:
