@@ -157,8 +157,12 @@ class SlotSymbol:
         return self.get_x(), self.get_y()
 
     # Width
-    
+    def get_width(self):
+        return self.width
+
     # Height
+    def get_height(self):
+        return self.height
     # Width, Height
     # Value
     # --
