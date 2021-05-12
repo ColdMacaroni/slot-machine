@@ -209,7 +209,7 @@ class SlotSymbol:
 # Subclass
 class WildSymbol(SlotSymbol):
     def __eq__(self, other):
-        if isinstance(other, SlotSymbol):
+        if isinstance(other, SlotSymbol) or isinstance(other, WildSymbol):
             # A Wild card will always match with others
             return True
 
@@ -299,6 +299,9 @@ def load_images(screen, directory, symbol_size):
             wild = img_files[img]
             continue
 
+        # TODO: Different amounts depending on the type
+        # E.g. Default cards appear more than wilds so there should be
+        # twice as many defaults as there are wilds.
         imgs.append(SlotSymbol(screen, img,
                                path.join(*directory, img_files[img]),
                                value=None, size=symbol_size))
@@ -314,7 +317,8 @@ def load_images(screen, directory, symbol_size):
 
     # Add the wild symbol with a special id
     if wild is not None:
-        imgs.append(WildSymbol(screen, -1, path.join(*directory, wild), wild_val))
+        imgs.append(WildSymbol(screen, -1, path.join(*directory, wild),
+                               value=wild_val, size=symbol_size))
 
     # Load all images
     # This is done so that they dont have to be loaded
