@@ -517,7 +517,9 @@ def main():
                                 offset=SYMBOL_OFFSET,
                                 return_whitespace=True)
 
+    # Game status thingies
     rolling = False
+    calculate_score = False
 
     running = True
     while running:
@@ -534,6 +536,7 @@ def main():
                     # print("SCATTER!")
                     # rolls = generate_roll(symbols, COLUMNS, ROWS + 20)
                     rolling = True
+                    # rolls = generate_roll()
 
             # Check for mouse button
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -550,7 +553,9 @@ def main():
             move_symbols(rolls, 20, ROWS)
 
             # Delete rolls that are out of the margins
-            rolls = del_out_of_bounds(rolls, screen_size()[1] - whitespace[1]- SYMBOL_OFFSET)
+            # By substracting the offset*3, the symbols always end up aligned
+            lower_bound = screen_size()[1] - whitespace[1] - SYMBOL_OFFSET * 3
+            rolls = del_out_of_bounds(rolls, lower_bound)
 
             # This will get a list of the amount of rows that need to
             # be removed before reaching the target amount of rolls
@@ -559,11 +564,15 @@ def main():
             if not all(rows_to_target):
                 # This condition will trigger when all columns have
                 # reached the ROWS amount
+                # Re-position slots in case of any misalignment
                 position_slots(rolls, ROWS, SYMBOL_SIZE)
-                print("All done, boss!")
 
+                # Update the current status
+                rolling = False
+                calculate_score = True
 
-            print([len(roll) for roll in rolls])
+        elif calculate_score:
+            print("Calculating score TBD")
 
         # Draw the slots
         for column in rolls:
