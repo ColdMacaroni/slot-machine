@@ -363,15 +363,13 @@ def move_symbols(slots, y_diff):
     pass
 
 
-def position_slots(slots, rows):
+def position_slots(slots, rows, slot_size):
     """"
     Position the slots spaced out and centered on the screen in a grid
     """
     # TODO: A way to only set so the first row is at the bottom
     # The offset in each direction
     offset = 15  # px
-
-    grid_width = 0
 
     for column in range(len(slots)):
         # In each column
@@ -394,10 +392,11 @@ def position_slots(slots, rows):
         # (Which they shouldnt be but you never know)
         avg_width = total_width / len(slots[column])
 
-        # Add to the total
-        grid_width += avg_width
+    # Add together the width of each column, same for row
+    grid_width = slot_size[0] * len(slots)
+    grid_height = [1]
 
-    # Add the offsets to the width
+    # Add the offsets to the width, same for row
     grid_width += (len(slots) - 1) * offset
 
     screen_width, screen_height = screen_size()
@@ -420,8 +419,6 @@ def position_slots(slots, rows):
 
 
     # Move all the items
-
-    # Set add half of the screen or something to the x to center
 
 
 def main():
