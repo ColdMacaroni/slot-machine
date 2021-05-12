@@ -314,7 +314,7 @@ def load_images(screen, directory, symbol_size):
 
     # Add the wild symbol with a special id
     if wild is not None:
-        imgs.append(WildSymbol(screen, -1, wild, wild_val))
+        imgs.append(WildSymbol(screen, -1, path.join(*directory, wild), wild_val))
 
     # Load all images
     # This is done so that they dont have to be loaded
