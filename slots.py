@@ -390,10 +390,14 @@ def main():
                     for column in range(len(rolls)):
                         for symbol in range(len(rolls[column])):
                             # Offset each column
-                            x = column * 120
-                            y = symbol * 120
+                            current_symbol = rolls[column][symbol]
+                            offset = 20  # px
 
-                            rolls[column][symbol].set_pos((x, y))
+                            # Get an offset based on the size of the symbol
+                            x = column * (current_symbol.get_width() + offset)
+                            y = symbol * (current_symbol.get_height() + offset)
+
+                            current_symbol.set_pos((x, y))
 
             # Check for mouse button
             elif event.type == pygame.MOUSEBUTTONDOWN:
