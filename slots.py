@@ -281,7 +281,7 @@ def create_values(amount,
     return wild_val, values
 
 
-def load_images(screen, directory):
+def load_images(screen, directory, symbol_size):
     """
     Load all images from a directory into a list so that they can be
     then drawn by pygame
@@ -301,7 +301,7 @@ def load_images(screen, directory):
 
         imgs.append(SlotSymbol(screen, img,
                                path.join(*directory, img_files[img]),
-                               value=None, size=(100, 100)))
+                               value=None, size=symbol_size))
 
     # -- Load values
     # Create values
@@ -363,23 +363,22 @@ def move_symbols(slots, y_diff):
     pass
 
 
-def position_slots(slots, rows, slot_size):
+def position_slots(slots, rows, slot_size,
+                   offset=15):
     """"
     Position the slots spaced out and centered on the screen in a grid
     """
-    # TODO: A way to only set so the first row is at the bottom
+    # TODO: A way to only set so it overflows on the top instead of the bottom,
+    # leaving the bottom row in its rightful position
     # The offset in each direction
-    offset = 15  # px
 
+    # This spaces out the elements
     for column in range(len(slots)):
         # In each column
-        total_width = 0
         for symbol in range(len(slots[column])):
             # Per row
             # Get the obj in a variable for easier method access
             current_symbol = slots[column][symbol]
-
-            total_width += current_symbol.get_width()
 
             # Get an offset based on the size of the symbol
             x = column * (current_symbol.get_width() + offset)
@@ -387,28 +386,36 @@ def position_slots(slots, rows, slot_size):
 
             current_symbol.set_pos((x, y))
 
-        # Get average width
-        # This is done in case some images are a different size
-        # (Which they shouldnt be but you never know)
-        avg_width = total_width / len(slots[column])
-
     # Add together the width of each column, same for row
     grid_width = slot_size[0] * len(slots)
-    grid_height = [1]
+    grid_height = slot_size[1] * rows
 
     # Add the offsets to the width, same for row
     grid_width += (len(slots) - 1) * offset
+    grid_height += (rows - 1) * offset
 
     screen_width, screen_height = screen_size()
 
     # Move all the items by the offset so that the grid is centered
-    x_offset = (screen_width / 2) - (grid_width/2)
+    x_offset = (screen_width / 2) - (grid_width / 2)
+    y_offset = (screen_height / 2) - (grid_width / 2)
+
+    # Move y by negative of total - offset
+
+    # Each column may have a different amount of rows, why? Idk lmao
+    # The amount of columns though is ok to be handled by the other ones.
+    # So to offset the y, get the total height of the rows.
+    # total_column_height = sum(column) * row_height + (sum(column) - 1) * offset
+    # Then to move the columns up, their y should have substracted total_column_height
+    # This will position the lowest y at 0. The top edge of the screen
+    # Then move each element down (add to y) by the y offset
 
     # Move them all by the offsets
     # TODO: Also add the y offset
     for column in range(len(slots)):
         # In each column
 
+        # Num of columns is constant
         for symbol in range(len(slots[column])):
             # Per row
             # Get the obj in a variable for easier method access
@@ -416,9 +423,6 @@ def position_slots(slots, rows, slot_size):
 
             current_symbol.set_x(current_symbol.get_x() + x_offset)
             # current_symbol.set_y(current_symbol.get_y() + y_offset)
-
-
-    # Move all the items
 
 
 def main():
@@ -430,14 +434,16 @@ def main():
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
 
-    # NOTE: Worth moving into functions?
+    # NOTE: Worth moving into functions or class?
     ROWS = 3
     COLUMNS = 2
+    SYMBOL_SIZE = (100, 100)  # px
 
     # Load symbols
     # Path is a list to be used with path.join()
-    symbols = load_images(screen, ["images", "symbols"])
+    symbols = load_images(screen, ["images", "symbols"], SYMBOL_SIZE)
 
+    # 20 is a totally arbitrary number so uh feel free to change
     rolls = generate_roll(symbols, COLUMNS, ROWS + 20)
 
     running = True
@@ -475,7 +481,7 @@ def main():
 
         screen.fill(Color.white)
 
-        position_slots(rolls, ROWS)
+        position_slots(rolls, ROWS, SYMBOL_SIZE)
 
         for column in rolls:
             for symbol in column:
