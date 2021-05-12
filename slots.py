@@ -364,13 +364,33 @@ def move_symbols(slots, y_diff):
 
 
 def position_slots(slots, rows, slot_size,
-                   offset=15):
+                   offset=15, return_whitespace=False):
     """"
     Position the slots spaced out and centered on the screen in a grid
+    Calculating the whitespace is a by-product that actually proves
+    useful
+
     """
-    # TODO: A way to only set so it overflows on the top instead of the bottom,
-    # leaving the bottom row in its rightful position
-    # The offset in each direction
+    # Add together the width of each column, same for row
+    grid_width = slot_size[0] * len(slots)
+    grid_height = slot_size[1] * rows
+
+    # Add the offsets to the width, same for row
+    grid_width += (len(slots) - 1) * offset
+    grid_height += (rows - 1) * offset
+
+    screen_width, screen_height = screen_size()
+
+    # Move all the items by the offset so that the grid is centered
+    x_offset = (screen_width / 2) - (grid_width / 2)
+    vertical_whitespace_width = x_offset
+
+    horizontal_whitespace_width = (screen_height / 2) - (grid_height / 2)
+    y_offset = horizontal_whitespace_width + grid_height
+
+    # Having this here avoids affecting all the images
+    if return_whitespace:
+        return horizontal_whitespace_width, vertical_whitespace_width
 
     # This spaces out the elements
     for column in range(len(slots)):
@@ -386,44 +406,38 @@ def position_slots(slots, rows, slot_size,
 
             current_symbol.set_pos((x, y))
 
-    # Add together the width of each column, same for row
-    grid_width = slot_size[0] * len(slots)
-    grid_height = slot_size[1] * rows
-
-    # Add the offsets to the width, same for row
-    grid_width += (len(slots) - 1) * offset
-    grid_height += (rows - 1) * offset
-
-    screen_width, screen_height = screen_size()
-
-    # Move all the items by the offset so that the grid is centered
-    x_offset = (screen_width / 2) - (grid_width / 2)
-    y_offset = (screen_height / 2) - (grid_width / 2)
-
-    # Move y by negative of total - offset
-
-    # Each column may have a different amount of rows, why? Idk lmao
-    # The amount of columns though is ok to be handled by the other ones.
-    # So to offset the y, get the total height of the rows.
-    # total_column_height = sum(column) * row_height + (sum(column) - 1) * offset
-    # Then to move the columns up, their y should have substracted total_column_height
-    # This will position the lowest y at 0. The top edge of the screen
-    # Then move each element down (add to y) by the y offset
-
-    # Move them all by the offsets
-    # TODO: Also add the y offset
+    # This moves each element by the offset
     for column in range(len(slots)):
-        # In each column
+        # Each column may have a different amount of rows, why? Idk lmao
+        # The amount of columns though is ok to be handled by the other ones.
+        # First get the total height of the rows
+        num_rows = len(slots[column])
+        total_column_height = num_rows * slot_size[1] + (num_rows - 1) * offset
 
-        # Num of columns is constant
+        # Then to move the columns up, their y should have substracted total_column_height
+        # This will position the lowest y at 0. The top edge of the screen
+        # Then move each element down (add to y) by the y offset
+        # This can be simplified to the following math thing
+        final_y_offset = -total_column_height + y_offset
+
         for symbol in range(len(slots[column])):
             # Per row
             # Get the obj in a variable for easier method access
             current_symbol = slots[column][symbol]
 
             current_symbol.set_x(current_symbol.get_x() + x_offset)
-            # current_symbol.set_y(current_symbol.get_y() + y_offset)
+            current_symbol.set_y(current_symbol.get_y() + final_y_offset)
 
+
+def create_margins(screen, color, horizontal_width, vertical_width):
+    """
+    Draws margins on the given pygame surface
+    :param screen: Pygame Surface
+    :param color: RGB color value
+    :param horizontal_width: Width of the horizontal in px
+    :param vertical_width: Width of the vertical in px
+    """
+    pass
 
 def main():
     # Pygame set up
@@ -436,7 +450,7 @@ def main():
 
     # NOTE: Worth moving into functions or class?
     ROWS = 3
-    COLUMNS = 2
+    COLUMNS = 4
     SYMBOL_SIZE = (100, 100)  # px
 
     # Load symbols
@@ -459,17 +473,7 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     print("SCATTER!")
-                    for column in range(len(rolls)):
-                        for symbol in range(len(rolls[column])):
-                            # Offset each column
-                            current_symbol = rolls[column][symbol]
-                            offset = 20  # px
-
-                            # Get an offset based on the size of the symbol
-                            x = column * (current_symbol.get_width() + offset)
-                            y = symbol * (current_symbol.get_height() + offset)
-
-                            current_symbol.set_pos((x, y))
+                    rolls = generate_roll(symbols, COLUMNS, ROWS + 20)
 
             # Check for mouse button
             elif event.type == pygame.MOUSEBUTTONDOWN:
