@@ -384,14 +384,24 @@ def move_symbols(slots, initial_rows, rows,
     """
     # TODO: Change this to slow down depending on the amount
     # of things left
-    for column in slots:
+
+    # Create a list of factors to multiply the speed for
+    # this will make different columns roll different speeds
+    speed_factors = list(range(1, len(slots) + 1))
+
+    # Reverse it so the column at the left is the fastest
+    speed_factors.reverse()
+
+    for column in range(len(slots)):
         # Skip columns that are already at the target amount
-        if len(column) == rows:
+        if len(slots[column]) == rows:
             pass
 
         else:
-            for symbol in column:
-                symbol.set_y(symbol.get_y() + speed)
+            # Set the speed for the column
+            column_speed = speed_factors[column] * speed
+            for symbol in slots[column]:
+                symbol.set_y(symbol.get_y() + column_speed)
 
 
 def position_slots(slots, rows, slot_size,
@@ -561,9 +571,10 @@ def main():
             # be removed before reaching the target amount of rolls
             rows_to_target = [len(roll) - ROWS for roll in rolls]
 
-            if not all(rows_to_target):
+            if sum(rows_to_target) == 0:
                 # This condition will trigger when all columns have
                 # reached the ROWS amount
+
                 # Re-position slots in case of any misalignment
                 position_slots(rolls, ROWS, SYMBOL_SIZE)
 
@@ -572,7 +583,7 @@ def main():
                 calculate_score = True
 
         elif calculate_score:
-            print("Calculating score TBD")
+            pass
 
         # Draw the slots
         for column in rolls:
