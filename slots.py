@@ -554,9 +554,6 @@ def main():
             if event.type == pygame.QUIT:
                 exit()
 
-            # TODO: Maybe key event stuff inside a func? Consider.
-            # Simply call it with the event
-            #
             # Only check for keys when a key has been pressed down
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and not rolling:
