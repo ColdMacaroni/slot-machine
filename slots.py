@@ -356,7 +356,72 @@ def generate_roll(ls, columns, rolls):
     return generated
 
 
-# TODO: Evenly space columns
+def move_symbols(slots, y_diff):
+    """
+    Move the slots based on the y axis by the diff given
+    """
+    pass
+
+
+def position_slots(slots):
+    """"
+    Position the slots spaced out and centered on the screen in a grid
+    """
+    # TODO: A way to only set so the first row is at the bottom
+    # The offset in each direction
+    offset = 15  # px
+
+    grid_width = 0
+
+    for column in range(len(slots)):
+        # In each column
+        total_width = 0
+        for symbol in range(len(slots[column])):
+            # Per row
+            # Get the obj in a variable for easier method access
+            current_symbol = slots[column][symbol]
+
+            total_width += current_symbol.get_width()
+
+            # Get an offset based on the size of the symbol
+            x = column * (current_symbol.get_width() + offset)
+            y = symbol * (current_symbol.get_height() + offset)
+
+            current_symbol.set_pos((x, y))
+
+        # Get average width
+        avg_width = total_width / len(slots[column])
+
+        grid_width += avg_width
+
+    # Add the offsets to the width
+    # The sum comprehension thing gets how many spaces there are
+
+    grid_width += (len(slots) - 1) * offset
+
+    screen_width, screen_height = screen_size()
+
+    # Move all the items by the offset so that the grid is centered
+    x_offset = (screen_width / 2) - (grid_width/2)
+    print(screen_width, grid_width)
+
+    # Move them all by the offsets
+    # TODO: Also add the y offset
+    for column in range(len(slots)):
+        # In each column
+
+        for symbol in range(len(slots[column])):
+            # Per row
+            # Get the obj in a variable for easier method access
+            current_symbol = slots[column][symbol]
+
+            current_symbol.set_x(current_symbol.get_x() + x_offset)
+            # current_symbol.set_y(current_symbol.get_y() + y_offset)
+
+
+    # Move all the items
+
+    # Set add half of the screen or something to the x to center
 
 
 def main():
@@ -408,6 +473,8 @@ def main():
                 #    print(pos_inside_rect(symbols[i][1], pygame.mouse.get_pos()))
 
         screen.fill(Color.white)
+
+        position_slots(rolls)
 
         for column in rolls:
             for symbol in column:
