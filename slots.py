@@ -388,10 +388,6 @@ def position_slots(slots, rows, slot_size,
     horizontal_whitespace_width = (screen_height / 2) - (grid_height / 2)
     y_offset = horizontal_whitespace_width + grid_height
 
-    # Having this here avoids affecting all the images
-    if return_whitespace:
-        return horizontal_whitespace_width, vertical_whitespace_width
-
     # This spaces out the elements
     for column in range(len(slots)):
         # In each column
@@ -428,8 +424,11 @@ def position_slots(slots, rows, slot_size,
             current_symbol.set_x(current_symbol.get_x() + x_offset)
             current_symbol.set_y(current_symbol.get_y() + final_y_offset)
 
+    if return_whitespace:
+        return horizontal_whitespace_width, vertical_whitespace_width
 
-def create_margins(screen, color, horizontal_width, vertical_width):
+
+def draw_margins(screen, color, horizontal_width, vertical_width):
     """
     Draws margins on the given pygame surface
     :param screen: Pygame Surface
@@ -438,6 +437,7 @@ def create_margins(screen, color, horizontal_width, vertical_width):
     :param vertical_width: Width of the vertical in px
     """
     pass
+
 
 def main():
     # Pygame set up
@@ -459,6 +459,11 @@ def main():
 
     # 20 is a totally arbitrary number so uh feel free to change
     rolls = generate_roll(symbols, COLUMNS, ROWS + 20)
+
+    # Whitespace will be used to cover up images that are
+    # drawn out of bounds + this position the images in a grid
+    whitespace = position_slots(rolls, ROWS, SYMBOL_SIZE,
+                                return_whitespace=True)
 
     running = True
     while running:
@@ -483,18 +488,17 @@ def main():
                 #for i in range(len(symbols)):
                 #    print(pos_inside_rect(symbols[i][1], pygame.mouse.get_pos()))
 
+        # Clear screen
         screen.fill(Color.white)
 
-        position_slots(rolls, ROWS, SYMBOL_SIZE)
-
+        # Draw the slots
         for column in rolls:
             for symbol in column:
                 symbol.draw()
-        # TODO: Update to work with the class
-        # Use blit to draw images
-        # screen.blit(img, rect)
-        #for i in range(len(symbols)):
-        #    screen.blit(symbols[i][0], symbols[i][1])
+
+        # Cover up slots
+        draw_margins(screen, Color.white, *whitespace)
+
 
         pygame.display.flip()
         clock.tick(60)
