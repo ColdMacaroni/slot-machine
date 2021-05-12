@@ -363,7 +363,7 @@ def move_symbols(slots, y_diff):
     pass
 
 
-def position_slots(slots):
+def position_slots(slots, rows):
     """"
     Position the slots spaced out and centered on the screen in a grid
     """
@@ -390,20 +390,20 @@ def position_slots(slots):
             current_symbol.set_pos((x, y))
 
         # Get average width
+        # This is done in case some images are a different size
+        # (Which they shouldnt be but you never know)
         avg_width = total_width / len(slots[column])
 
+        # Add to the total
         grid_width += avg_width
 
     # Add the offsets to the width
-    # The sum comprehension thing gets how many spaces there are
-
     grid_width += (len(slots) - 1) * offset
 
     screen_width, screen_height = screen_size()
 
     # Move all the items by the offset so that the grid is centered
     x_offset = (screen_width / 2) - (grid_width/2)
-    print(screen_width, grid_width)
 
     # Move them all by the offsets
     # TODO: Also add the y offset
@@ -433,11 +433,15 @@ def main():
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
 
+    # NOTE: Worth moving into functions?
+    ROWS = 3
+    COLUMNS = 2
+
     # Load symbols
     # Path is a list to be used with path.join()
     symbols = load_images(screen, ["images", "symbols"])
 
-    rolls = generate_roll(symbols, 3, 10)
+    rolls = generate_roll(symbols, COLUMNS, ROWS + 20)
 
     running = True
     while running:
@@ -474,7 +478,7 @@ def main():
 
         screen.fill(Color.white)
 
-        position_slots(rolls)
+        position_slots(rolls, ROWS)
 
         for column in rolls:
             for symbol in column:
