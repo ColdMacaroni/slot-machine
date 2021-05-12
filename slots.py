@@ -377,14 +377,11 @@ def del_out_of_bounds(slots, lower_bound):
     return new_slots
 
 
-def move_symbols(slots, initial_rows, rows,
-                 speed=5):
+def move_symbols(slots, rows, top_fix,
+                 speed=2):
     """
     Move the slots based on the y axis by the diff given
     """
-    # TODO: Change this to slow down depending on the amount
-    # of things left
-
     # Create a list of factors to multiply the speed for
     # this will make different columns roll different speeds
     speed_factors = list(range(1, len(slots) + 1))
@@ -395,11 +392,21 @@ def move_symbols(slots, initial_rows, rows,
     for column in range(len(slots)):
         # Skip columns that are already at the target amount
         if len(slots[column]) == rows:
-            pass
+            # Fix misalignment issues
+            # Get the difference between the highest row and the
+            # expected top value
+            y_diff = top_fix - slots[column][0].get_y()
+
+            # Only run through the loop if the diff isnt 0
+            if y_diff:
+                for symbol in slots[column]:
+                    symbol.set_y(symbol.get_y() + y_diff)
 
         else:
             # Set the speed for the column
-            column_speed = speed_factors[column] * speed
+            # Multiplying makes the column slow down as it stops
+            column_speed = (speed_factors[column] * speed)\
+                           * len(slots[column]) / 4
             for symbol in slots[column]:
                 symbol.set_y(symbol.get_y() + column_speed)
 
@@ -498,6 +505,16 @@ def draw_margins(screen, color, horizontal_width, vertical_width):
     pygame.draw.rect(screen, color, vertical_bar)
 
 
+def update_slots(slots, new_slots):
+    """
+    Adds new rolls to the slots so that they can be rolled again
+    """
+    for column in range(len(slots)):
+        slots[column] = new_slots[column] + slots[column]
+
+    return slots
+
+
 def main():
     # Pygame set up
     pygame.init()
@@ -518,8 +535,8 @@ def main():
     symbols = load_images(screen, ["images", "symbols"], SYMBOL_SIZE)
 
     # 20 is a totally arbitrary number so uh feel free to change
-    rolls = generate_roll(symbols, COLUMNS, ROWS + 20)
-
+    extra_rows = 20
+    rolls = generate_roll(symbols, COLUMNS, ROWS)
 
     # Whitespace will be used to cover up images that are
     # drawn out of bounds + this position the images in a grid
@@ -543,13 +560,22 @@ def main():
             # Only check for keys when a key has been pressed down
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and not rolling:
-                    # print("SCATTER!")
-                    # rolls = generate_roll(symbols, COLUMNS, ROWS + 20)
+                    # Generate more symbols to add on top of the
+                    # Current ones
+                    new_rolls = generate_roll(symbols, COLUMNS,
+                                              extra_rows)
+
+                    rolls = update_slots(rolls, new_rolls)
+
+                    # Put them into position
+                    position_slots(rolls, ROWS, SYMBOL_SIZE,
+                                   offset=SYMBOL_OFFSET)
+
                     rolling = True
-                    # rolls = generate_roll()
 
             # Check for mouse button
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                # TODO: Call function for processing the button clicks
                 pass
                 # If ANY mouse button has been pressed, print if the
                 # cursor was inside the image
@@ -560,7 +586,8 @@ def main():
         screen.fill(Color.white)
 
         if rolling:
-            move_symbols(rolls, 20, ROWS)
+            # Move the columns
+            move_symbols(rolls, ROWS, whitespace[0])
 
             # Delete rolls that are out of the margins
             # By substracting the offset*3, the symbols always end up aligned
