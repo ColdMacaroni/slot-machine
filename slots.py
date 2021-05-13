@@ -755,11 +755,15 @@ def all_triangle_lines(rows, columns):
     return all_triangle, all_flip_triangle
 
 
-def all_horizontal_lines():
+def all_dip_lines():
     return
 
 
-def all_horizontal_lines():
+def all_saw_lines():
+    return
+
+
+def all_middle_peak_lines():
     return
 
 
@@ -808,7 +812,6 @@ def generate_lines(rows, columns):
     all_middle_peak = []
     for y in range(rows - 1):
         all_middle_peak.append(shift_points(middle_peak, (0, y)))
-
 
     return all_horizontal, all_triangle, all_dip, all_saw, all_middle_peak
 
