@@ -573,8 +573,42 @@ def triangle_line(columns):
     :param columns: Amount of columns to generate for
     :return: List
     """
-    # TODO
-    return []
+    line = []
+    # Create the first half of the triangle, up to the peak
+    # Same value is used to make the coords go both up 1 by 1
+
+    # Even lists have 2 peaks so they are handled differently
+    # Subtracts 1 from columns if its even. This way the num is
+    # always odd. Even nums get their second peak added after the loop
+    for i in range(((columns - int(not columns % 2)) // 2) + 1):
+        line.append((i, i))
+
+    # Create a second peak if columns is even
+    if not columns % 2:
+        peak = line[-1]
+
+        # Increase the peak's x by one
+        line.append((peak[0] + 1, peak[1]))
+
+    # How many numbers are missing. i.e. The points thatll go down
+    rest = columns - len(line)
+
+    # This is to make x values continue from where they left off
+    start = len(line)
+
+    downwards_portion = []
+    for x in range(rest):
+        # Get the y value of the point at the opposite side of the peak
+        # I'm not exactly sure why you have to also substract by one
+        # but that makes it work
+        downwards_portion.append((start + x, line[rest - x - 1][1]))
+
+    # Put them together
+    line += downwards_portion
+
+    print(line)
+
+    return line
 
 
 def dip_line(columns):
