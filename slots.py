@@ -4,7 +4,7 @@
 
 import pygame
 from os import listdir, path
-from random import randint, choice
+from random import randint
 
 # Use deepcopy when selecting from the list, this way the x, y and
 # other attributes can be changed independently
@@ -209,7 +209,11 @@ class SlotSymbol:
 # Subclass
 class WildSymbol(SlotSymbol):
     def __eq__(self, other):
-        if isinstance(other, SlotSymbol) or isinstance(other, WildSymbol):
+        if isinstance(other, WildSymbol):
+            # Wild symbols don't match between themselves
+            return self.sym_id == other.sym_id
+
+        elif isinstance(other, SlotSymbol):
             # A Wild card will always match with others
             return True
 
@@ -328,7 +332,7 @@ def load_images(screen, directory, symbol_size):
     """
     img_files = listdir(path.join(*directory))
     # TODO: Pass img_files through isfile()
-
+    # TODO: Support for multiple wilds
     imgs = []
     wild = None
     # Create symbol objects
