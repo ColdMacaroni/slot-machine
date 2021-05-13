@@ -587,6 +587,25 @@ def dip_line(columns):
     line.append((columns - 1, 1))
 
     return line
+
+
+def saw_line(columns):
+    """
+    Coordinates for a saw-like line
+    /\\/\
+    :param columns: Amount of columns to generate for
+    :return: List
+    """
+    line = []
+
+    # Even nums have a y of 0 while odd nums have a y of 1
+    # This is way smaller than what i had planned im so proud of it
+    # this could even be 1 line compared to the 30ish i had planned
+    for x in range(columns):
+        line.append((x, x % 2))
+
+    return line
+
 # --
 
 
@@ -635,8 +654,16 @@ def generate_lines(rows, columns):
     lines.append(all_dip)
     # TODO: Flip dip and do that tooo
 
-    # 20
+    # 20 -- saw & flipped
+    saw = saw_line(columns)
 
+    # Only need to shift em up by one less
+    all_saw = []
+    for y in range(rows - 1):
+        all_saw.append(shift_points(saw, (0, y)))
+
+    lines.append(all_saw)
+    
     # 26
 
     return lines
