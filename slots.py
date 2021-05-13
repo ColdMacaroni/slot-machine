@@ -590,8 +590,8 @@ def main():
     clock = pygame.time.Clock()
 
     # NOTE: Worth moving into functions or class?
-    ROWS = 3
-    COLUMNS = 4
+    ROWS = 4
+    COLUMNS = 5
     SYMBOL_SIZE = (100, 100)  # px
     SYMBOL_OFFSET = 15  # px
 
