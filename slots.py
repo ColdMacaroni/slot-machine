@@ -555,6 +555,18 @@ def horizontal_lines(columns):
     return line
 
 
+def triangle_lines(columns):
+    """
+    Generate the coordinates for a line that goes up and then down
+    :param columns: Amount of columns to generate for
+    :return: List
+    """
+    # TODO
+    return []
+
+
+
+
 def generate_lines(rows, columns):
     """
     Returns a 3D list of coordinates of the lines used to calculate
@@ -574,8 +586,24 @@ def generate_lines(rows, columns):
         # Create the same pattern at different y levels
         all_horizontal.append(shift_points(horizontal, (0, y)))
 
-    # Add to the finallist
+    # Add to the final list
     lines.append(all_horizontal)
+
+    # 8
+    triangle = triangle_lines(columns)
+
+    # Shift
+    # TODO: Shift the triangle ones logic
+    all_triangle = [triangle]  # PLACEHOLDER
+
+    # Add to the final list
+    lines.append(all_triangle)
+
+    # 14
+
+    # 20
+
+    # 26
 
     return lines
 
@@ -593,7 +621,7 @@ def main():
     ROWS = 4
     COLUMNS = 5
     SYMBOL_SIZE = (100, 100)  # px
-    SYMBOL_OFFSET = 15  # px
+    SYMBOL_OFFSET = 10  # px
 
     # Load symbols
     # Path is a list to be used with path.join()
