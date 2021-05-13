@@ -859,6 +859,65 @@ def flip_2d(ls):
     return new_ls
 
 
+def get_values(positions, ls):
+    """
+    Return values from a 2d list as determined by the position provided
+    :param positions: A list of (x, y)
+    :param ls: A 2D list
+    """
+    new_ls = []
+
+    for pos in positions:
+        new_ls.append(ls[pos[1]][pos[0]])
+
+    return new_ls
+
+
+def symbols_equal(ls):
+    """
+    Check how many items are equal from the start of a list
+    :param ls: A list
+    :return:
+    """
+    ids = [sym.sym_id for sym in ls]
+
+    # This returns the length if all ids are equal
+    if len(set(ids)) == 1:
+        return len(ids)
+
+    counter = 0
+
+    # First item = id[0]
+    # but if it is below 0 (wild) loop through the list until
+    # A non negative one is found and assign that to first
+
+    # run through the list to see if the items are equal to the first
+    # NOTE: Order of comparison is important for the wilds
+    # Break from for loop if they are different
+    # If they are equal add to a counter and then return the counter
+
+    # return the list up to counter
+    return counter, ls[:counter]
+
+
+def calculate_score(slots, lines):
+    # Horizontal, peak, etc.
+    for line_type in lines:
+
+        # Normal or flipped
+        for status in line_type:
+
+            # The row in which the line is
+            for row in status:
+                symbols = get_values(slots, row)
+                equals, equal_slots = symbols_equal(symbols)
+
+                # TODO
+
+            # If the score is more than three, draw the sprite
+
+
+
 def main():
     # Pygame set up
     pygame.init()
@@ -891,7 +950,9 @@ def main():
     # Generate the lines used for checking the rolls
     # Yes, a ~5D list. Too bad!
     lines = generate_lines(ROWS, COLUMNS)
-    print(lines)
+
+    # 0 < selected_lines <= len(lines)
+    selected_lines = 1
 
     # Game status thingies
     # TODO: Find a more efficient way of doing this
@@ -957,7 +1018,8 @@ def main():
                 calculating_score = True
 
         elif calculating_score:
-            pass
+            calculate_score(flip_2d(rolls), lines[:selected_lines])
+            print("Calculating!")
 
         # Draw the slots
         for column in rolls:
