@@ -663,8 +663,10 @@ def generate_lines(rows, columns):
         all_saw.append(shift_points(saw, (0, y)))
 
     lines.append(all_saw)
-    
-    # 26
+    # TODO: Flip saw and do that tooo
+
+    # 26 -- middle_peak
+    # TODO: middle peak function
 
     return lines
 
