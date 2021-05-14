@@ -859,7 +859,7 @@ def flip_2d(ls):
     return new_ls
 
 
-def get_values(positions, ls):
+def get_values(ls, positions):
     """
     Return values from a 2d list as determined by the position provided
     :param positions: A list of (x, y)
@@ -883,7 +883,7 @@ def symbols_equal(ls):
 
     # This returns the length if all ids are equal
     if len(set(ids)) == 1:
-        return len(ids)
+        return len(ids), ls
 
     counter = 0
 
@@ -911,7 +911,8 @@ def calculate_score(slots, lines):
             for row in status:
                 symbols = get_values(slots, row)
                 equals, equal_slots = symbols_equal(symbols)
-
+                
+                print(equals, equal_slots)
                 # TODO
 
             # If the score is more than three, draw the sprite
@@ -1018,7 +1019,9 @@ def main():
                 calculating_score = True
 
         elif calculating_score:
-            calculate_score(flip_2d(rolls), lines[:selected_lines])
+            # lines[:selected_lines]
+            visible_slots = flip_2d(rolls)
+            calculate_score(visible_slots, lines[:selected_lines])
             print("Calculating!")
 
         # Draw the slots
