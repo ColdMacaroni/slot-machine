@@ -363,8 +363,8 @@ def load_images(screen, directory, symbol_size):
         imgs[i].value = values[i]
 
     # Add the wild symbol with a special id
-    for wild in wilds:
-        imgs.append(WildSymbol(screen, -1, path.join(*directory, wild),
+    for wild in range(len(wilds)):
+        imgs.append(WildSymbol(screen, -wild - 1, path.join(*directory, wilds[wild]),
                                value=wild_val, size=symbol_size))
 
     # Load all images
