@@ -908,7 +908,7 @@ def symbols_equal(ls):
         else:
             break
     # return the list up to counter
-    return equal, ls[:equal]
+    return ls[:equal]
 
 
 def calculate_value(slots, multiplier=1):
@@ -918,7 +918,29 @@ def calculate_value(slots, multiplier=1):
     return sum([slot.value for slot in slots]) * multiplier
 
 
+def calculate_score_logic(symbols):
+    """
+    The logic used to calculate scores
+    :param symbols:
+    :return:
+    """
+    # Get the equals
+    equal_slots = symbols_equal(symbols)
+
+    # 3 is the minimum amount of consecutive symbols
+    score = 0
+    if len(equal_slots) >= 3:
+        score = calculate_value(equal_slots)
+
+    return score
+
+
 def calculate_score(slots, lines):
+    """
+    Calculate the score of the given slots according to the lines
+    """
+    total_score = 0
+    symbols_to_draw = []
     # Horizontal, peak, etc.
     for line_type in lines:
 
@@ -929,12 +951,12 @@ def calculate_score(slots, lines):
             for row in status:
                 symbols = get_values(slots, row)
 
-                equals, equal_slots = symbols_equal(symbols)
-                
-                print(equals, equal_slots)
-                # TODO
+                symbols_to_draw.append(symbols)
 
-            # If the score is more than three, draw the sprite
+                score = calculate_score_logic(symbols)
+                total_score += score
+
+    return total_score, symbols_to_draw
 
 
 def main():
@@ -975,8 +997,14 @@ def main():
 
     # Game status thingies
     # TODO: Find a more efficient way of doing this
-    rolling = False
-    calculating_score = False
+    status = 0
+    # 0. Nothing
+    # 1. rolling
+    # 2. calculating score
+    # 3. Set slot margins
+
+    # For checking passed time
+    time = 0
 
     running = True
     while running:
@@ -986,7 +1014,7 @@ def main():
 
             # Only check for keys when a key has been pressed down
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and not rolling:
+                if event.key == pygame.K_SPACE and status == 0:
                     # Generate more symbols to add on top of the
                     # Current ones
                     new_rolls = generate_roll(symbols, COLUMNS,
@@ -998,7 +1026,7 @@ def main():
                     position_slots(rolls, ROWS, SYMBOL_SIZE,
                                    offset=SYMBOL_OFFSET)
 
-                    rolling = True
+                    status = 1
 
             # Check for mouse button
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -1012,7 +1040,7 @@ def main():
         # Clear screen
         screen.fill(Color.white)
 
-        if rolling:
+        if status == 1:
             # Move the columns
             move_symbols(rolls, ROWS, whitespace[0])
 
@@ -1033,14 +1061,20 @@ def main():
                 position_slots(rolls, ROWS, SYMBOL_SIZE, SYMBOL_OFFSET)
 
                 # Update the current status
-                rolling = False
-                calculating_score = True
+                status = 2
 
-        elif calculating_score:
+        # Calculate score
+        elif status == 2:
             # lines[:selected_lines]
             visible_slots = flip_2d(rolls)
-            calculate_score(visible_slots, lines[:selected_lines])
-            print("Calculating!")
+            score, slots_to_draw = calculate_score(visible_slots, lines[:selected_lines])
+            status = 3
+
+        # Draw the margins
+        elif status == 3:
+            # TODO
+            status = 0
+
 
         # Draw the slots
         for column in rolls:
