@@ -298,8 +298,8 @@ def pos_inside_rect(rect, pos):
 
 
 def generate_values(amount,
-                    wild_val=5, default_val=10,
-                    max_val=60, big_vals=3):
+                    wild_val=5, default_val=8,
+                    max_val=30, big_vals=3):
     """
     Create a list of values according to the amount given and
     parameters
@@ -998,6 +998,15 @@ def calculate_score(slots, lines):
 
 
 def main():
+    # Cost per lines
+    costs = {
+        1: 4,
+        2: 8,
+        3: 14,
+        4: 20,
+        5: 26
+    }
+
     # Pygame set up
     pygame.init()
 
@@ -1031,9 +1040,11 @@ def main():
     lines = generate_lines(ROWS, COLUMNS)
 
     # 0 < selected_lines <= len(lines)
-    selected_lines = len(lines)
+    selected_lines = 1
 
-    total_score = 0
+    # Starting score
+    total_score = 100
+    score = 0
 
     # Game status thingies
     # TODO: Find a more efficient way of doing this
@@ -1061,6 +1072,11 @@ def main():
             # and when nothing else is happening
             elif event.type == pygame.KEYDOWN and status == 0:
                 if event.key == pygame.K_SPACE:
+                    # Reduce score
+                    if total_score >= costs[selected_lines]:
+                        total_score -= costs[selected_lines]
+                        print(total_score)
+
                     # Generate more symbols to add on top of the
                     # Current ones
                     new_rolls = generate_roll(symbols, COLUMNS,
@@ -1072,6 +1088,7 @@ def main():
                     position_slots(rolls, ROWS, SYMBOL_SIZE,
                                    offset=SYMBOL_OFFSET)
 
+                    # Set status to rolling
                     status = 1
 
             # Check for mouse button
