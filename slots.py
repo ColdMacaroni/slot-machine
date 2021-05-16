@@ -924,12 +924,6 @@ def symbols_equal(ls):
     :param ls: A list
     :return:
     """
-    ids = [sym.sym_id for sym in ls]
-
-    # This returns the length if all symbols are equal
-    if len(set(ids)) == 1:
-        return len(ls), ls
-
     first = None
     # Obtain the item to compare to, cant be a wild symbol
     for symbol in ls:
