@@ -13,7 +13,8 @@ from copy import copy
 
 class SlotSymbol:
     def __init__(self, surface, sym_id, filename, value,
-                 size=(75, 75), pos=(0, 0), color_key=(0, 0, 0)):
+                 size=(75, 75), pos=(0, 0), color_key=(0, 0, 0),
+                 margin_color=(221, 215, 50), margin_width=2):
         """
         Generate an image to be used in the slot machine
         :param surface: Pygame surface
@@ -24,6 +25,8 @@ class SlotSymbol:
         :keyword size: Tuple with size of image in px
         :keyword pos: X,Y position the image will be drawn at
         :keyword color_key: The rgb color to be used as transparency
+        :keyword margin_color: RGB color for the margin
+        :keyword margin_width: Width in px for the margin
         """
         # Params
         self.surface = surface
@@ -36,9 +39,15 @@ class SlotSymbol:
         self.x, self.y = pos
         self.color_key = color_key
 
+        self.margin_color = margin_color  # Gold
+        self.margin_width = margin_width
+
         # To be changed by self.load_images()
         self.image = None
         self.rect = None
+
+        # To be changed by outside code
+        self.margin = True
 
     def __eq__(self, other):
         # Comparison to be done by IDs instead of objects themselves
@@ -134,6 +143,12 @@ class SlotSymbol:
         """
         self.value = value
 
+    def set_margin(self, boolean):
+        """
+        Sets whether to display the margin or not
+        """
+        self.margin = boolean
+
     # -- Get methods
     # X
     def get_x(self):
@@ -208,6 +223,29 @@ class SlotSymbol:
         # Draw image
         self.surface.blit(self.image, self.rect)
 
+        # Margin
+        if self.margin:
+            self.draw_margin()
+
+    def draw_margin(self):
+        """
+        Draws a margin for the image
+        """
+        # Calculate coordinates
+        top_left = self.get_pos()
+        top_right = (top_left[0] + self.get_width(), top_left[1])
+        bottom_right = (top_right[0], top_right[1] + self.height)
+        bottom_left = (top_left[0], top_left[1] + self.height)
+
+        # Draw the lines
+        pygame.draw.line(self.surface, self.margin_color,
+                         top_left, top_right, self.margin_width)
+        pygame.draw.line(self.surface, self.margin_color,
+                         top_right, bottom_right, self.margin_width)
+        pygame.draw.line(self.surface, self.margin_color,
+                         bottom_right, bottom_left, self.margin_width)
+        pygame.draw.line(self.surface, self.margin_color,
+                         bottom_left, top_left, self.margin_width)
 
 # Subclass
 class WildSymbol(SlotSymbol):
