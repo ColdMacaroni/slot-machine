@@ -1033,7 +1033,7 @@ def main():
     lines = generate_lines(ROWS, COLUMNS)
 
     # 0 < selected_lines <= len(lines)
-    selected_lines = 1
+    selected_lines = len(lines)
 
     # Game status thingies
     # TODO: Find a more efficient way of doing this
@@ -1046,6 +1046,11 @@ def main():
     # For checking passed time
     time = 0
 
+    # slots for which the margin will be drawn
+    slots_to_draw = []
+
+    # The index for slots_to_draw so they are drawn one at a time
+    slot_line_index = 0
     running = True
     while running:
         for event in pygame.event.get():
@@ -1106,21 +1111,46 @@ def main():
 
         # Calculate score
         elif status == 2:
-            # lines[:selected_lines]
             visible_slots = flip_2d(rolls)
             score, slots_to_draw = calculate_score(visible_slots, lines[:selected_lines])
             status = 3
 
         # Draw the margins
         elif status == 3:
-            for line in slots_to_draw:
-                print(line)
-                for symbol in line:
+            time += 1
+
+            if slot_line_index >= len(slots_to_draw):
+                # After all of them are done then go back to normal
+
+                # Hide the margins of the last line
+                if len(slots_to_draw) != 0:
+                    for symbol in slots_to_draw[-1]:
+                        symbol.set_margin(False)
+
+                # Reset values
+                slot_line_index = 0
+                status = 0
+                time = 0
+
+            # 60 = 1s
+            # 90 = 1.5s
+            elif time <= 90:
+                # Hide the margins of the previous line
+                if slot_line_index != 0:
+                    for symbol in slots_to_draw[slot_line_index - 1]:
+                        symbol.set_margin(False)
+
+                for symbol in slots_to_draw[slot_line_index]:
                     symbol.set_margin(True)
-            status = 0
+
+            else:
+                # Increase to the next line
+                slot_line_index += 1
+                time = 0
 
 
-        # Draw the slots
+
+        # Draw the symbols
         for column in rolls:
             for symbol in column:
                 symbol.draw()
