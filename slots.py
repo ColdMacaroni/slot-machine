@@ -47,7 +47,7 @@ class SlotSymbol:
         self.rect = None
 
         # To be changed by outside code
-        self.margin = True
+        self.margin = False
 
     def __eq__(self, other):
         # Comparison to be done by IDs instead of objects themselves
@@ -555,8 +555,8 @@ def draw_margins(screen, color, horizontal_width, vertical_width):
     pygame.draw.rect(screen, color, vertical_bar)
 
     # Shift the bars to the other side
-    horizontal_bar.y = screen_height - horizontal_width
-    vertical_bar.x = screen_width - vertical_width
+    horizontal_bar.y = screen_height - horizontal_width + 2
+    vertical_bar.x = screen_width - vertical_width + 2
 
     # Draw em again
     pygame.draw.rect(screen, color, horizontal_bar)
@@ -970,7 +970,7 @@ def calculate_score_logic(symbols):
     if len(equal_slots) >= 3:
         score = calculate_value(equal_slots)
 
-    return score
+    return score, symbols[:len(equal_slots)]
 
 
 def calculate_score(slots, lines):
@@ -989,9 +989,11 @@ def calculate_score(slots, lines):
             for row in status:
                 symbols = get_values(slots, row)
 
-                symbols_to_draw.append(symbols)
+                score, equal_slots = calculate_score_logic(symbols)
 
-                score = calculate_score_logic(symbols)
+                if score > 0:
+                    symbols_to_draw.append(equal_slots)
+
                 total_score += score
 
     return total_score, symbols_to_draw
@@ -1051,8 +1053,9 @@ def main():
                 exit()
 
             # Only check for keys when a key has been pressed down
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and status == 0:
+            # and when nothing else is happening
+            elif event.type == pygame.KEYDOWN and status == 0:
+                if event.key == pygame.K_SPACE:
                     # Generate more symbols to add on top of the
                     # Current ones
                     new_rolls = generate_roll(symbols, COLUMNS,
@@ -1110,7 +1113,10 @@ def main():
 
         # Draw the margins
         elif status == 3:
-            # TODO
+            for line in slots_to_draw:
+                print(line)
+                for symbol in line:
+                    symbol.set_margin(True)
             status = 0
 
 
