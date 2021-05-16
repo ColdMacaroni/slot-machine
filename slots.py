@@ -337,13 +337,13 @@ def load_images(screen, directory, symbol_size):
     # TODO: Pass img_files through isfile()
     # TODO: Support for multiple wilds
     imgs = []
-    wild = None
+    wilds = []
     # Create symbol objects
     for img in range(len(img_files)):
         # I dont know why pycharm expects an int
         if "wild" in img_files[img]:
             # The wild symbol will be done after
-            wild = img_files[img]
+            wilds.append(img_files[img])
             continue
 
         # TODO: Different amounts depending on the type
@@ -363,7 +363,7 @@ def load_images(screen, directory, symbol_size):
         imgs[i].value = values[i]
 
     # Add the wild symbol with a special id
-    if wild is not None:
+    for wild in wilds:
         imgs.append(WildSymbol(screen, -1, path.join(*directory, wild),
                                value=wild_val, size=symbol_size))
 
