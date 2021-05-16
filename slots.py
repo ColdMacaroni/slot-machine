@@ -48,8 +48,8 @@ class SlotSymbol:
         else:
             return False
 
-    def __str__(self):
-        return self.filename
+    def __repr__(self):
+        return f"{self.__class__} {self.filename}"
 
     # -- Set Methods
     # X
@@ -884,9 +884,9 @@ def symbols_equal(ls):
     """
     ids = [sym.sym_id for sym in ls]
 
-    # This returns the length if all ids are equal
+    # This returns the length if all symbols are equal
     if len(set(ids)) == 1:
-        return len(ids), ls
+        return len(ls), ls
 
     first = None
     # Obtain the item to compare to, cant be a wild symbol
@@ -899,20 +899,23 @@ def symbols_equal(ls):
     if first is None:
         first = ls[0]
 
-    equal = 1
-    print(first)
+    equal = 0
     # Count how many items are continuously equal
     for symbol in ls:
-        print(symbol.filename, first.filename, symbol.filename == first.filename)
-        # Not working
         if symbol == first:
-            print("equal!", symbol.filename)
             equal += 1
 
         else:
             break
     # return the list up to counter
     return equal, ls[:equal]
+
+
+def calculate_value(slots, multiplier=1):
+    """
+    Calculates the total value of the slots given
+    """
+    return sum([slot.value for slot in slots]) * multiplier
 
 
 def calculate_score(slots, lines):
@@ -924,10 +927,7 @@ def calculate_score(slots, lines):
 
             # The row in which the line is
             for row in status:
-                print(row[1])
                 symbols = get_values(slots, row)
-
-                print([s.filename for s in symbols])
 
                 equals, equal_slots = symbols_equal(symbols)
                 
