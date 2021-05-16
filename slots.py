@@ -400,16 +400,20 @@ def load_images(screen, directory, symbol_size):
     for i in range(len(imgs)):
         imgs[i].value = values[i]
 
-    # Add the wild symbol with a special id
-    for wild in range(len(wilds)):
-        imgs.append(WildSymbol(screen, -wild - 1, path.join(*directory, wilds[wild]),
-                               value=wild_val, size=symbol_size))
-
     # Load all images
     # This is done so that they dont have to be loaded
     # for every copy
     for img in imgs:
         img.load_image()
+
+    # Duplicate items in list to make them more common than the wild
+    imgs += imgs
+
+    # Add the wild symbol with a special id
+    for wild in range(len(wilds)):
+        imgs.append(WildSymbol(screen, -wild - 1, path.join(*directory, wilds[wild]),
+                               value=wild_val, size=symbol_size))
+        imgs[-1].load_image()
 
     return imgs
 
@@ -1035,6 +1039,8 @@ def main():
     # 0 < selected_lines <= len(lines)
     selected_lines = len(lines)
 
+    total_score = 0
+
     # Game status thingies
     # TODO: Find a more efficient way of doing this
     status = 0
@@ -1131,6 +1137,10 @@ def main():
                 slot_line_index = 0
                 status = 0
                 time = 0
+
+                total_score += score
+
+                print(total_score)
 
             # 60 = 1s
             # 90 = 1.5s
