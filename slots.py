@@ -48,6 +48,9 @@ class SlotSymbol:
         else:
             return False
 
+    def __str__(self):
+        return self.filename
+
     # -- Set Methods
     # X
     def set_x(self, x):
@@ -885,19 +888,31 @@ def symbols_equal(ls):
     if len(set(ids)) == 1:
         return len(ids), ls
 
-    counter = 0
+    first = None
+    # Obtain the item to compare to, cant be a wild symbol
+    for symbol in ls:
+        if not isinstance(symbol, WildSymbol):
+            first = symbol
+            break
 
-    # First item = id[0]
-    # but if it is below 0 (wild) loop through the list until
-    # A non negative one is found and assign that to first
+    # Idk if this will happen but here it is just in case
+    if first is None:
+        first = ls[0]
 
-    # run through the list to see if the items are equal to the first
-    # NOTE: Order of comparison is important for the wilds
-    # Break from for loop if they are different
-    # If they are equal add to a counter and then return the counter
+    equal = 1
+    print(first)
+    # Count how many items are continuously equal
+    for symbol in ls:
+        print(symbol.filename, first.filename, symbol.filename == first.filename)
+        # Not working
+        if symbol == first:
+            print("equal!", symbol.filename)
+            equal += 1
 
+        else:
+            break
     # return the list up to counter
-    return counter, ls[:counter]
+    return equal, ls[:equal]
 
 
 def calculate_score(slots, lines):
@@ -909,14 +924,17 @@ def calculate_score(slots, lines):
 
             # The row in which the line is
             for row in status:
+                print(row[1])
                 symbols = get_values(slots, row)
+
+                print([s.filename for s in symbols])
+
                 equals, equal_slots = symbols_equal(symbols)
                 
                 print(equals, equal_slots)
                 # TODO
 
             # If the score is more than three, draw the sprite
-
 
 
 def main():
