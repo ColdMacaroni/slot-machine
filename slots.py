@@ -1002,6 +1002,60 @@ def calculate_score(slots, lines):
     return total_score, symbols_to_draw
 
 
+def render_text(text, font=None,
+                font_name="Arial", size=60, bold=False, italic=False,
+                antialias=True, color=(0, 0, 0), background=None):
+    """
+    Returns a pygame object than can be blit-ed
+    :param text: String to be used
+    :param font: A pygame font object, if not provided the font is
+    rendered according to the other keywords
+
+    Keywords for generating the font
+    :param font_name: The font, default is Arial. Sysfont
+    :param size: Font size, int
+    :param bold: Bool
+    :param italic: Bool
+
+    Keywords for rendering
+    :param antialias: Bool
+    :param color: RGB tuple, font color
+    :param background: RGB tuple, background color
+
+    :return: Pygame object
+    """
+    if font is None:
+        font = pygame.font.SysFont(font_name, size, bold, italic)
+
+    return font.render(text, antialias, color, background)
+
+
+def write_score(screen, score, prev_text="Score: ", whitespace=10):
+    """
+    Write the score to the screen to the top left
+    :param screen: Pygame screen
+    :param score: The score to display
+    :param prev_text: The text before the score
+    :param whitespace: The whitespace before the edges
+    """
+    display_string = prev_text + str(score)
+
+    text = render_text(display_string)
+
+    screen.blit(text, (whitespace, whitespace))
+
+
+def write_bet(screen, bet, prev_text="Bet: ", whitespace=10):
+    """
+    Blits the bet to the top right of the screen
+    :param screen: Pygame surface
+    :param bet: The bet
+    :param prev_text: The text before the net
+    :param whitespace: The whitespace before the edges
+    """
+    pass
+
+
 def main():
     # Cost per lines
     costs = {
@@ -1174,8 +1228,6 @@ def main():
                 slot_line_index += 1
                 time = 0
 
-
-
         # Draw the symbols
         for column in rolls:
             for symbol in column:
@@ -1183,6 +1235,12 @@ def main():
 
         # Cover up slots
         draw_margins(screen, Color.white, *whitespace)
+
+        # Score
+        write_score(screen, total_score)
+
+        # Bet
+        write_bet(screen, costs[selected_lines])
 
         pygame.display.flip()
         clock.tick(60)
