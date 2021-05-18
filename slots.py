@@ -1040,7 +1040,7 @@ def main():
     lines = generate_lines(ROWS, COLUMNS)
 
     # 0 < selected_lines <= len(lines)
-    selected_lines = 1
+    selected_lines = len(lines)
 
     # Starting score
     total_score = 100
