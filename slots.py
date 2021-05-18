@@ -474,7 +474,8 @@ def move_symbols(slots, rows, top_fix,
 
 
 def position_slots(slots, rows, slot_size,
-                   offset=15, return_whitespace=False):
+                   offset=15, screen_width=None, screen_height=None,
+                   return_whitespace=False):
     """"
     Position the slots spaced out and centered on the screen in a grid
     Calculating the whitespace is a by-product that actually proves
@@ -489,7 +490,11 @@ def position_slots(slots, rows, slot_size,
     grid_width += (len(slots) - 1) * offset
     grid_height += (rows - 1) * offset
 
-    screen_width, screen_height = screen_size()
+    if screen_width is None:
+        screen_width = screen_size()[0]
+
+    if screen_height is None:
+        screen_height = screen_size()[1]
 
     # Move all the items by the offset so that the grid is centered
     x_offset = (screen_width / 2) - (grid_width / 2)
