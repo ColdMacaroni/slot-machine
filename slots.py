@@ -1030,30 +1030,43 @@ def render_text(text, font=None,
     return font.render(text, antialias, color, background)
 
 
-def write_score(screen, score, prev_text="Score: ", whitespace=10):
+def write_score(screen, score, prev_text="Score: ",
+                whitespace=10, font_size=40):
     """
     Write the score to the screen to the top left
     :param screen: Pygame screen
     :param score: The score to display
     :param prev_text: The text before the score
     :param whitespace: The whitespace before the edges
+    :param font_size: font size
     """
     display_string = prev_text + str(score)
 
-    text = render_text(display_string)
+    text = render_text(display_string, size=font_size)
 
     screen.blit(text, (whitespace, whitespace))
 
 
-def write_bet(screen, bet, prev_text="Bet: ", whitespace=10):
+def write_bet(screen, bet, prev_text="Bet: ",
+              whitespace=10, font_size=40):
     """
     Blits the bet to the top right of the screen
     :param screen: Pygame surface
     :param bet: The bet
     :param prev_text: The text before the net
     :param whitespace: The whitespace before the edges
+    :param font_size: The font size
     """
-    pass
+    width = screen_size()[0]
+
+    display_string = prev_text + str(bet)
+
+    text = render_text(display_string, size=font_size)
+
+    # Align text to the right
+    x = width - text.get_width() - whitespace
+
+    screen.blit(text, (x, whitespace))
 
 
 def main():
@@ -1079,6 +1092,7 @@ def main():
     COLUMNS = 5
     SYMBOL_SIZE = (100, 100)  # px
     SYMBOL_OFFSET = 10  # px
+    FONT_SIZE = 40
 
     # Load symbols
     # Path is a list to be used with path.join()
@@ -1099,7 +1113,7 @@ def main():
     lines = generate_lines(ROWS, COLUMNS)
 
     # 0 < selected_lines <= len(lines)
-    selected_lines = len(lines)
+    selected_lines = 1
 
     # Starting score
     total_score = 100
@@ -1134,7 +1148,6 @@ def main():
                     # Reduce score
                     if total_score >= costs[selected_lines]:
                         total_score -= costs[selected_lines]
-                        print(total_score)
 
                     # Generate more symbols to add on top of the
                     # Current ones
@@ -1149,6 +1162,21 @@ def main():
 
                     # Set status to rolling
                     status = 1
+
+                elif event.key == pygame.K_1:
+                    selected_lines = 1
+
+                elif event.key == pygame.K_2:
+                    selected_lines = 2
+
+                elif event.key == pygame.K_3:
+                    selected_lines = 3
+
+                elif event.key == pygame.K_4:
+                    selected_lines = 4
+
+                elif event.key == pygame.K_5:
+                    selected_lines = 5
 
             # Check for mouse button
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -1237,10 +1265,10 @@ def main():
         draw_margins(screen, Color.white, *whitespace)
 
         # Score
-        write_score(screen, total_score)
+        write_score(screen, total_score, font_size=FONT_SIZE)
 
         # Bet
-        write_bet(screen, costs[selected_lines])
+        write_bet(screen, costs[selected_lines], font_size=FONT_SIZE)
 
         pygame.display.flip()
         clock.tick(60)
